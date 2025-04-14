@@ -1,0 +1,22 @@
+branch-defaults:
+  main:
+    environment: node-mail-2-dev
+    group_suffix: null
+environment-defaults:
+  mi-api-node-env:
+    branch: null
+    repository: null
+global:
+  application_name: node-mail-2
+  branch: null
+  default_ec2_keyname: mail-node
+  default_platform: Node.js 22 running on 64bit Amazon Linux 2023
+  default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: null
+  repository: null
+  sc: git
+  workspace_type: Application
