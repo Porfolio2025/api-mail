@@ -5,9 +5,30 @@ require("dotenv").config();
 
 const app = express();
 
-app.use(cors({
-  origin: 'https://portfolio.chrisdevstudio.com'
-}));
+const whitelist = [
+  "https://portfolio.chrisdevstudio.com",
+  "https://os.chrisdevstudio.com",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (whitelist.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(
+  cors({
+    corsOptions,
+  })
+);
+
 app.use(express.json());
 
 app.post("/api/contact", async (req, res) => {
