@@ -6,6 +6,9 @@ environment-defaults:
   mi-api-node-env:
     branch: null
     repository: null
+  node-mail-2-dev:
+    branch: null
+    repository: null
 global:
   application_name: node-mail-2
   branch: null

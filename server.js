@@ -5,7 +5,9 @@ require("dotenv").config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://portfolio.chrisdevstudio.com'
+}));
 app.use(express.json());
 
 app.post("/api/contact", async (req, res) => {
