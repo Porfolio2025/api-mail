@@ -29,11 +29,11 @@ jobs:
             cd /home/ec2-user/api-mail
             git pull origin test
             cat << sudo tee .env > /dev/null
-            PORT=$PORT
-            EMAIL_USER=$EMAIL_USER
-            EMAIL_PASS=$EMAIL_PASS
-            EMAIL_FROM=$EMAIL_FROM
-            EMAIL_TO=$EMAIL_TO
+PORT=$PORT
+EMAIL_USER=$EMAIL_USER
+EMAIL_PASS=$EMAIL_PASS
+EMAIL_FROM=$EMAIL_FROM
+EMAIL_TO=$EMAIL_TO
             
             sudo docker stop api-mail-container || true
             sudo docker rm api-mail-container || true
