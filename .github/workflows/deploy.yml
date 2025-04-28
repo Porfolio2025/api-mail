@@ -1,0 +1,34 @@
+name: Deploy to EC2 (test branch)
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 server
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+          KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          echo "$KEY" > key.pem
+          chmod 600 key.pem
+
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$HOST << 'EOF'
+            cd /home/ec2-user/portfolio-inner-page
+            git pull origin test
+            sudo docker stop api-mail-container || true
+            sudo docker rm api-mail-container || true
+
+            sudo docker build -t api-mail .
+
+            sudo docker run -d --name api-mail-container -p 3002:3002 --env-file .env api-mail
+
+          EOF
