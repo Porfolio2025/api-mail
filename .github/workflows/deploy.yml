@@ -13,30 +13,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to EC2 server
-        env:
-          HOST: ${{ secrets.EC2_HOST }}
-          KEY:  ${{ secrets.EC2_SSH_KEY }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-          PORT: ${{ secrets.PORT }}
+      - name: Generate .env file
         run: |
-          echo "$KEY" > key.pem
-          chmod 600 key.pem
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$HOST << 'EOF'
-            cd /home/ec2-user/api-mail
-            git pull origin test
-            cat << sudo tee .env > /dev/null
-PORT=$PORT
-EMAIL_USER=$EMAIL_USER
-EMAIL_PASS=$EMAIL_PASS
-EMAIL_FROM=$EMAIL_FROM
-EMAIL_TO=$EMAIL_TO
-            
-            sudo docker stop api-mail-container || true
-            sudo docker rm api-mail-container || true
-            sudo docker build -t api-mail .
-            sudo docker run -d --name api-mail-container -p 3002:3002 --env-file .env api-mail
+          cat > .env <<EOF
+          PORT=${{ secrets.PORT }}
+          EMAIL_USER=${{ secrets.EMAIL_USER }}
+          EMAIL_PASS=${{ secrets.EMAIL_PASS }}
+          EMAIL_FROM=${{ secrets.EMAIL_FROM }}
+          EMAIL_TO=${{ secrets.EMAIL_TO }}
           EOF
+
+      - name: Copy project and .env to EC2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: ".env,server.js,package.json,Dockerfile"
+          target: "/home/ec2-user/api-mail"
+
+      - name: Run Docker on EC2
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/api-mail
+            docker stop api-mail-container || true
+            docker rm   api-mail-container || true
+            docker build -t api-mail .
+            docker run -d \
+              --name api-mail-container \
+              -p 3002:3002 \
+              --env-file .env \
+              api-mail
