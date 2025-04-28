@@ -27,7 +27,7 @@ jobs:
           chmod 600 key.pem
 
           ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$HOST << EOF
-            cd /home/ec2-user/portfolio-inner-page
+            cd /home/ec2-user/api-mail
 
             git pull origin test
 
