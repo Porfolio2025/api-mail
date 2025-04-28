@@ -55,7 +55,7 @@ app.post("/api/contact", async (req, res) => {
       from: process.env.EMAIL_FROM, // Usar un correo verificado en SES
       to: process.env.EMAIL_TO,
       replyTo: email, // Aquí va el email del usuario
-      subject: `New message from ${name} (${company || "No company"})`,
+      subject: `Nuevo mensaje de ${name} (${company || "Sin empresa"})`,
       text: message,
       html: `
         <p><strong>Name:</strong> ${name}</p>
