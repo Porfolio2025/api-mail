@@ -42,7 +42,9 @@ app.post("/api/contact", async (req, res) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "email-smtp.us-west-2.amazonaws.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -50,8 +52,9 @@ app.post("/api/contact", async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"${name}" <${email}>`,
+      from: process.env.EMAIL_FROM, // Usar un correo verificado en SES
       to: process.env.EMAIL_TO,
+      replyTo: email, // Aquí va el email del usuario
       subject: `New message from ${name} (${company || "No company"})`,
       text: message,
       html: `
@@ -72,7 +75,7 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
 });
