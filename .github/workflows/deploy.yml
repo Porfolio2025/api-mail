@@ -40,10 +40,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/api-mail
-            docker stop api-mail-container || true
-            docker rm   api-mail-container || true
-            docker build -t api-mail .
-            docker run -d \
+            sudo docker stop api-mail-container || true
+            sudo docker rm   api-mail-container || true
+            sudo docker build -t api-mail .
+            sudo docker run -d \
               --name api-mail-container \
               -p 3002:3002 \
               --env-file .env \
