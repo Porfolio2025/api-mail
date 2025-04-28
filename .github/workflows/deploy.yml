@@ -17,18 +17,32 @@ jobs:
         env:
           HOST: ${{ secrets.EC2_HOST }}
           KEY: ${{ secrets.EC2_SSH_KEY }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: |
           echo "$KEY" > key.pem
           chmod 600 key.pem
 
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$HOST << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@$HOST << EOF
             cd /home/ec2-user/portfolio-inner-page
+
             git pull origin test
+
+            # Crear el .env dinámicamente
+            cat > .env << EOL
+            PORT=3000
+            EMAIL_USER=$EMAIL_USER
+            EMAIL_PASS=$EMAIL_PASS
+            EMAIL_FROM=$EMAIL_FROM
+            EMAIL_TO=$EMAIL_TO
+            EOL
+
             sudo docker stop api-mail-container || true
             sudo docker rm api-mail-container || true
 
             sudo docker build -t api-mail .
 
-            sudo docker run -d --name api-mail-container -p 3002:3002 --env-file .env api-mail
-
+            sudo docker run -d --name api-mail-container -p 3002:3000 --env-file .env api-mail
           EOF
