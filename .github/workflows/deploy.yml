@@ -44,5 +44,5 @@ jobs:
 
             sudo docker build -t api-mail .
 
-            sudo docker run -d --name api-mail-container -p 3002:3000 --env-file .env api-mail
+            sudo docker run -d --name api-mail-container -p 3002:3002 --env-file .env api-mail
           EOF
